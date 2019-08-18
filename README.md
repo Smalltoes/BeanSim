@@ -24,4 +24,4 @@ It does through the use of the state.py file, which describes states, essentiall
 The main file patches these two parts together. Ideally, it should be the only file to know that both sides of the equation exist.
 It takes the graphics engine from graphics and state definitions, and uses this to display the updates that simulation.py processes.
 
-This program requires (besides standard python packages) pygame and probbably numpy.
+This program requires (besides standard python packages) pygame and probably numpy.
