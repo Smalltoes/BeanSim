@@ -1,9 +1,8 @@
 from graphics import engine
 from graphics import state
-from simulation import world
+from simulation import world, organism
 
 import pygame
-
 
 
 class SimState(state.State):
@@ -44,6 +43,7 @@ class SimState(state.State):
             iterY = 0
             iterX += 1
         #print("rendered")
+
 
 
     
