@@ -1,5 +1,8 @@
 # BeanSim
 
+bean bean bean bean bean
+
+bean bean bean bean bean bean bean 
 
 A natural selection simulation of blobs or something. Beans
 
