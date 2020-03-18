@@ -48,7 +48,8 @@ class SimState(state.State):
 smallBean = organism.Species("smallBean", 5, 20, (0, 200, 100), [], True)
 
 beanEater = organism.Species("beanEater", 10, 10, (255, 0, 0), ["smallBean"], False)
-    
+
+
 game = engine.Engine(1600, 900, "Hello, World!", 20)
 game.switchState(SimState)
 game.run()
