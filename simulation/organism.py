@@ -16,6 +16,11 @@ class Organism:
         self.x = x
         self.y = y
         self.species = species
+        self.speed = species.speed
+        self.speciesName = species.name
+        self.color = species.color
+        self.prey = species.prey
+        self.herbivore = species.herbivore
 
 
 
