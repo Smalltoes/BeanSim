@@ -20,9 +20,10 @@ class Organism:
         self.speciesName = species.name
         self.speed = random.normalvariate(mu=species.speed, sigma=0.1*species.speed)
         self.size = random.normalvariate(mu=species.size, sigma=0.1*species.size)
-        self.color = (random.normalvariate(mu=species.color[0], sigma=10),
-                      random.normalvariate(mu=species.color[1], sigma=10),
-                      random.normalvariate(mu=species.color[2], sigma=10))
+        self.color = ((clamp(0, 255, random.normalvariate(mu=species.color[0], sigma=10))),
+                      (clamp(0, 255, random.normalvariate(mu=species.color[1], sigma=10))),
+                      (clamp(0, 255, random.normalvariate(mu=species.color[2], sigma=10))))
+
         self.prey = species.prey
         self.herbivore = species.herbivore
         self.numOffspring = species.numOffspring
@@ -44,14 +45,15 @@ def reproduce(org1, org2):
             child = Organism(org1.x, org1.y, org1.species)
             child.speed = random.normalvariate(mu=0.5 * (org1.speed + org2.speed), sigma=0.1 * org1.species.speed)
             child.size = random.normalvariate(mu=0.5 * (org1.size + org2.size), sigma=0.1 * org1.species.size)
-            child.color = (random.normalvariate(mu=0.5 * (org1.color[0] + org2.color[0]), sigma=10),
-                           random.normalvariate(mu=0.5 * (org1.color[1] + org2.color[1]), sigma=10),
-                           random.normalvariate(mu=0.5 * (org1.color[2] + org2.color[2]), sigma=10))
+            child.color = (clamp(0, 255, random.normalvariate(mu=0.5 * (org1.color[0] + org2.color[0]), sigma=10)),
+                           clamp(0, 255, random.normalvariate(mu=0.5 * (org1.color[1] + org2.color[1]), sigma=10)),
+                           clamp(0, 255, random.normalvariate(mu=0.5 * (org1.color[2] + org2.color[2]), sigma=10)))
             # sets up parameters for child to be weighted around the average of parent parameters
             offspring.append(child)
 
     return offspring
 
 
-
+def clamp(lower, upper, value):
+    return min(upper, max(lower, value))
 

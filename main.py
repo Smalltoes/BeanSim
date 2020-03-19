@@ -2,19 +2,27 @@ from graphics import engine
 from graphics import state
 from simulation import world, organism
 
+import random
+
 import pygame
 
 
 class SimState(state.State):
     def __init__(self, display, data, switchFunc):
+
+        #ignore - this is for the graphics basically
         super().__init__(display,data,switchFunc)
-        self.world = world.World(160, 90, 100, 255, 90)
+        self.world = world.World(320, 180, 100, 255, 90)
         margin = 50
         self.boxSize = min((display.get_width()-margin * 2) //self.world.width, (display.get_height()-margin * 2) //self.world.height)
         self.startX = display.get_width() //2 -self.boxSize * self.world.width//2
         self.startY = display.get_height() // 2 - self.boxSize * self.world.height //2
-        print (self.boxSize, self.startX, self.startY)
         
+
+        
+        self.intializeEcosystem(20, 5)
+
+
     def render(self):
         iterX = 0
         iterY = 0
@@ -42,12 +50,33 @@ class SimState(state.State):
 
             iterY = 0
             iterX += 1
-        #print("rendered")
+        for animal in self.animals:
+            
+            pygame.draw.circle(self.displaysurf, animal.color, (int(animal.x * self.boxSize + self.startX), int(animal.y * self.boxSize + self.startY)), int(animal.size))
+
+    def intializeEcosystem(self, initialSmallBeanAmount, initialBeanEaterAmount):
+        self.animals = []
+        smallBean = organism.Species("smallBean", 5, 20, (0, 200, 100), [], True, 4)
+
+        beanEater = organism.Species("beanEater", 10, 10, (255, 0, 0), ["smallBean"], False, 2)
+        for x in range(initialSmallBeanAmount):
+            animalX, animalY = self.findRandomUsableTile()
+            self.animals.append(organism.Organism(animalX, animalY, smallBean))
+
+        for x in range(initialBeanEaterAmount):
+            animalX, animalY = self.findRandomUsableTile()
+            self.animals.append(organism.Organism(animalX, animalY, beanEater))
+
+    def findRandomUsableTile(self):
+        x = random.randint(1, self.world.width-2)
+        y = random.randint(1, self.world.height-2)
+        while (self.world.landscapeMap[x][y] == "S"):
+            x = random.randint(1, self.world.width-2)
+            y = random.randint(1, self.world.height-2)
+        return x,y
 
 
-smallBean = organism.Species("smallBean", 5, 20, (0, 200, 100), [], True, 4)
 
-beanEater = organism.Species("beanEater", 10, 10, (255, 0, 0), ["smallBean"], False, 2)
 
 game = engine.Engine(1600, 900, "Hello, World!", 20)
 game.switchState(SimState)
