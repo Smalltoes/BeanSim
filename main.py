@@ -12,6 +12,11 @@ class SimState(state.State):
 
         #ignore - this is for the graphics basically
         super().__init__(display,data,switchFunc)
+
+        self.drawLoadingMessage()
+
+
+
         self.world = world.World(320, 180, 100, 255, 90)
         margin = 50
         self.boxSize = min((display.get_width()-margin * 2) //self.world.width, (display.get_height()-margin * 2) //self.world.height)
@@ -74,6 +79,13 @@ class SimState(state.State):
             x = random.randint(1, self.world.width-2)
             y = random.randint(1, self.world.height-2)
         return x,y
+
+    def drawLoadingMessage(self):
+        self.displaysurf.fill(pygame.color.Color("White"))
+        basicFont = pygame.font.SysFont("Arial", 24)
+        fontSurf = basicFont.render("Initializing...", True, (0,0,0), (255,255,255))
+        self.displaysurf.blit(fontSurf, (self.displaysurf.get_width()//2 - fontSurf.get_width()//2, self.displaysurf.get_height()//2 - fontSurf.get_width()//2))
+        pygame.display.update()
 
 
 

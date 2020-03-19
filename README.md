@@ -1,8 +1,6 @@
 # BeanSim
 
-bean bean bean bean bean
 
-bean bean bean bean bean bean bean 
 
 A natural selection simulation of blobs or something. Beans
 
@@ -28,3 +26,10 @@ The main file patches these two parts together. Ideally, it should be the only f
 It takes the graphics engine from graphics and state definitions, and uses this to display the updates that simulation.py processes.
 
 This program requires (besides standard python packages) pygame and probably numpy.
+
+#Current Plans - Austin
+
+- Add in scaling and camera movement to make supporting bigger maps easier
+- - correctly scale organisms or change the size parameter
+- Add basic multithreading to not lock up the program while the map is generating so the user does not think its broken
+
