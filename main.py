@@ -37,13 +37,13 @@ class SimState(state.State):
                 rect = (self.startX + iterX * self.boxSize, self.startY + self.boxSize * iterY, self.boxSize, self.boxSize)
                 #print(rect)
                 if self.world.landscapeMap[x][y] == "S":
-                    color = pygame.color.Color("Blue")
+                    color = pygame.color.Color("aquamarine")
                 elif self.world.landscapeMap[x][y] == "B":
                     color = pygame.color.Color("Yellow")
                 elif self.world.landscapeMap[x][y] == "G":
-                    color = pygame.color.Color("Green")
+                    color = pygame.color.Color("darkGreen")
                 elif self.world.landscapeMap[x][y] == "H":
-                    color = pygame.color.Color("Brown")
+                    color = pygame.color.Color("darkgoldenrod")
                 elif self.world.landscapeMap[x][y] == "M":
                     color = pygame.color.Color("Gray")
                 elif self.world.landscapeMap[x][y] == "U":
