@@ -9,8 +9,7 @@ import copy
 import random
 import queue
 import statistics
-
-
+import numpy as np
 darkToLightCharacters = ".'`,^:\";~-_+<>i!lI?/\\|()1{}[]rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@"
 #in the landscape map, S means Sea
 
@@ -31,11 +30,11 @@ class World:
         self.plateAmount= plateAmount
         self.heightVariability = heightVariability
         self.waterLevel = waterLevel
-        self.tectonicMap = self.createEmptyMap()
-        self.temperatureMap = self.createEmptyMap()
-        self.heightMap = self.createEmptyMap()
-        self.boundaryMap = self.createEmptyMap()
-        self.landscapeMap = self.createEmptyMap()
+        self.tectonicMap = self.createEmptyMap(True)
+        self.temperatureMap = self.createEmptyMap(False)
+        self.heightMap = self.createEmptyMap(False)
+        self.boundaryMap = self.createEmptyMap(True)
+        self.landscapeMap = self.createEmptyTextMap()
 
         self.tectonicMap, self.seeds = self.voronoiMap(self.tectonicMap, self.plateAmount)
         self.getHeightFromTectonics()
@@ -55,12 +54,18 @@ class World:
         print()
         #self.printHigherLighter(self.heightMap, self.heightVariability)
 
-    def createEmptyMap(self):
+    def createEmptyMap(self, inttrue):
+        if inttrue:
+            newMap = np.zeros((self.width, self.height), dtype=np.int32)
+        else:
+            newMap = np.zeros((self.width, self.height))
+        return newMap
+    def createEmptyTextMap(self):
         newMap = []
         for x in range(self.width):
             newMap.append([])
             for y in range(self.height):
-                newMap[x].append(0)
+                newMap[x].append("")
         return newMap
 
     def getTilesAroundTile(self, x, y):
@@ -96,10 +101,10 @@ class World:
             self.landscapeMap[tile[0]][tile[1]]="S"
             for otherTile in self.getTilesAroundTile(tile[0], tile[1]):
                 #print(otherTile)
-                if self.heightMap[otherTile[0]][otherTile[1]] < self.waterLevel and otherTile not in checked:
+                if self.heightMap[otherTile[0],otherTile[1]] < self.waterLevel and otherTile not in checked:
                     frontier.put(otherTile)
                     checked.add(otherTile)
-                elif self.heightMap[otherTile[0]][otherTile[1]] < 100 and otherTile not in checked:
+                elif self.heightMap[otherTile[0],otherTile[1]] < 100 and otherTile not in checked:
                     self.landscapeMap[otherTile[0]][otherTile[1]] = "B"
 
         for x in range(self.width):
@@ -124,57 +129,59 @@ class World:
         #print(len(self.tectonicMap[1]))
         for x in range(self.width):
             #print(self.tectonicMap[x][-1])
-            heights[self.tectonicMap[x][0]-1] = 0
-            heights[self.tectonicMap[x][-1]-1]= 0
+            heights[self.tectonicMap[x,0]-1] = 0
+            heights[self.tectonicMap[x,-1]-1]= 0
 
         for y in range(self.height):
-            heights[self.tectonicMap[0][y]-1] = 0
-            heights[self.tectonicMap[-1][y]-1]= 0
-
+            heights[self.tectonicMap[0,y]-1] = 0
+            heights[self.tectonicMap[-1,y]-1]= 0
+        #print(self.heightMap)
         for x in range(self.width):
             for y in range(self.height):
-                self.heightMap[x][y] = heights[self.tectonicMap[x][y]-1]
+                #print(self.tectonicMap[x,y])
+                
+                self.heightMap[x,y] = heights[self.tectonicMap[x,y]-1]
 
     def randomWeatherHeight(self):
         heightsChanged=[]
         for x in range(self.width):
             for y in range(self.height):
-                if (random.random()+self.heightMap[x][y]/(self.heightVariability*1.2)) > 1.05 and self.heightMap[x][y] != 0:
-                    heightsChanged.append(self.heightMap[x][y])
-                    self.heightMap[x][y] -= 1
+                if (random.random()+self.heightMap[x,y]/(self.heightVariability*1.2)) > 1.05 and self.heightMap[x,y] != 0:
+                    heightsChanged.append(self.heightMap[x,y])
+                    self.heightMap[x,y] -= 1
 
         #print(statistics.median(heightsChanged))
 
     def perlinSmoothMap(self, mapToChange):
         for x in range(self.width - 1):
             for y in range(self.height -1):
-                mapToChange[x][y] = min(mapToChange[x][y], mapToChange[x][y+1])
+                mapToChange[x,y] = min(mapToChange[x,y], mapToChange[x,y+1])
         return mapToChange
 
     def weatherBasedOnHeight(self):
         for x in range(self.width-1):
             for y in range(self.height-1):
-                xHeightDifference = self.heightMap[x][y] - self.heightMap[x+1][y]
+                xHeightDifference = self.heightMap[x,y] - self.heightMap[x+1,y]
                 if abs(xHeightDifference) > 1:
                     #print("yas")
-                    self.heightMap[x][y] -= xHeightDifference//2
-                    self.heightMap[x+1][y] += xHeightDifference//2
+                    self.heightMap[x,y] -= xHeightDifference//2
+                    self.heightMap[x+1,y] += xHeightDifference//2
 
                     #print(self.heightMap[x][y])
-                yHeightDifference = self.heightMap[x][y] - self.heightMap[x][y+1]
+                yHeightDifference = self.heightMap[x,y] - self.heightMap[x,y+1]
                 if abs(yHeightDifference) > 1:
                     #print("yas")
-                    self.heightMap[x][y] -= yHeightDifference//2
-                    self.heightMap[x][y+1] += yHeightDifference//2
+                    self.heightMap[x,y] -= yHeightDifference//2
+                    self.heightMap[x,y+1] += yHeightDifference//2
     def createBoundaryMap(self):
 
         for x in range(self.width - 1):
             for y in range(self.height - 1):
-                if self.tectonicMap[x][y] != self.tectonicMap[x+1][y] and self.heightMap[x][y] != 0 and self.heightMap[x+1][y] != 0:
-                    self.boundaryMap[x][y] = 1
+                if self.tectonicMap[x,y] != self.tectonicMap[x+1,y] and self.heightMap[x,y] != 0 and self.heightMap[x+1,y] != 0:
+                    self.boundaryMap[x,y] = 1
                     #self.boundaryMap[x+1][y] = 1
-                if self.tectonicMap[x][y] != self.tectonicMap[x][y+1] and self.heightMap[x][y] != 0 and self.heightMap[x][y+1] != 0:
-                    self.boundaryMap[x][y] = 1
+                if self.tectonicMap[x,y] != self.tectonicMap[x,y+1] and self.heightMap[x,y] != 0 and self.heightMap[x,y+1] != 0:
+                    self.boundaryMap[x,y] = 1
                     #self.boundaryMap[x][y+1] = 1
 
     def voronoiMap(self, mapToChange, seedCount):
@@ -184,25 +191,25 @@ class World:
 
         iterX = 1
         for seed in seeds:
-            mapToChange[seed[0]][seed[1]] = iterX
+            mapToChange[seed[0],seed[1]] = iterX
             iterX+=1
 
         zeros = 1
         while zeros > 0:
-            newMap = copy.deepcopy(mapToChange)
+            newMap = np.copy(mapToChange)
             # self.printMap(mapToChange, 3)
             # print()
             zeros = 0
             for x in range(self.width):
                 for y in range(self.height):
-                    value = mapToChange[x][y]
+                    value = mapToChange[x,y]
                     if value == 0:
                         zeros += 1
                     else:
                         for tile in self.getTilesAroundTile(x, y):
                             #print(tile)
-                            if mapToChange[tile[0]][tile[1]] == 0:
-                                newMap[tile[0]][tile[1]] = value
+                            if mapToChange[tile[0],tile[1]] == 0:
+                                newMap[tile[0],tile[1]] = value
 
                         #self.safeChangeCell(newMap, x-1, y, value)
                         #self.safeChangeCell(newMap, x+1, y, value)
@@ -216,22 +223,22 @@ class World:
     def safeChangeCell(self, cellMap, x, y, newValue):
         correctedX = max(min(x, self.width -1 ), 0)
         correctedY = max(min(y, self.height-1), 0)
-        if cellMap[correctedX][correctedY] == 0: 
-            cellMap[correctedX][correctedY] = newValue
+        if cellMap[correctedX,correctedY] == 0: 
+            cellMap[correctedX,correctedY] = newValue
 
     def printMap(self, printMap, cellSize):
         for y in range(self.height):
             printLaya = []
             for x in range(self.width):
-                seedStringSize = len(str(printMap[x][y]))
-                printLaya.append(str(printMap[x][y]) + ' ' * (cellSize - seedStringSize))
+                seedStringSize = len(str(printMap[x,y]))
+                printLaya.append(str(printMap[x,y]) + ' ' * (cellSize - seedStringSize))
             print("".join(printLaya))
 
     def printHigherLighter(self, printMap, maxInMap):
         for y in range(self.height):
             printLaya = []
             for x in range(self.width):
-                normalizedValue = int(printMap[x][y]/maxInMap * (len(darkToLightCharacters)-1))
+                normalizedValue = int(printMap[x,y]/maxInMap * (len(darkToLightCharacters)-1))
                 # print(normalizedValue)
                 printLaya.append(darkToLightCharacters[normalizedValue]) 
 
