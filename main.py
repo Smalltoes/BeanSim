@@ -5,6 +5,7 @@ from simulation import world, organism
 import random
 
 import pygame
+from pygame.locals  import *
 
 
 class SimState(state.State):
@@ -17,7 +18,7 @@ class SimState(state.State):
 
 
 
-        self.world = world.World(320, 180, 100, 255, 90)
+        self.world = world.World(160, 90, 100, 255, 90)
         margin = 50
         self.boxSize = min((display.get_width()-margin * 2) //self.world.width, (display.get_height()-margin * 2) //self.world.height)
         self.startX = display.get_width() //2 -self.boxSize * self.world.width//2
@@ -29,6 +30,15 @@ class SimState(state.State):
 
 
     def render(self):
+        keypresses = pygame.key.get_pressed()
+        if (keypresses[K_d]):
+            self.startX += 5
+        elif (keypresses[K_a]):
+            self.startX -= 5
+        if (keypresses[K_w]):
+            self.startY -= 5
+        elif (keypresses[K_s]):
+            self.startY += 5
         iterX = 0
         iterY = 0
         color = pygame.color.Color("Black")
@@ -58,7 +68,9 @@ class SimState(state.State):
         for animal in self.animals:
             
             pygame.draw.circle(self.displaysurf, animal.color, (int(animal.x * self.boxSize + self.startX), int(animal.y * self.boxSize + self.startY)), int(animal.size))
-
+    def update(self):
+        pass
+    
     def intializeEcosystem(self, initialSmallBeanAmount, initialBeanEaterAmount):
         self.animals = []
         smallBean = organism.Species("smallBean", 5, 20, (0, 200, 100), [], True, 4)
