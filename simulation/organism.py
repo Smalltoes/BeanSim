@@ -28,6 +28,9 @@ class Organism:
         self.herbivore = species.herbivore
         self.numOffspring = species.numOffspring
         self.gender = random.randint(0, 2)
+        self.metabolismRate = self.size ** (1/3) * self.speed
+        self.maxEnergy = self.size
+
 
 
 def reproduce(org1, org2):
